@@ -74,7 +74,7 @@ resource "aws_subnet" "private" {
   availability_zone = each.value.availability_zone
 
   tags = merge(
-    { "Name" = "${var.name}-private-${each.key}" },
+    { "Name" = "${var.name}-${var.private_subnet_suffix}-${each.key}" },
     var.tags,
     var.private_subnet_tags,
   )
