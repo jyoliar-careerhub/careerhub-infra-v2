@@ -8,14 +8,14 @@ output "vpc_cidr_block" {
   value       = module.vpc.vpc_cidr_block
 }
 
-output "public_subnet_objects" {
+output "public_subnet_ids" {
   description = "A list of all public subnets, containing the full objects."
-  value       = module.vpc.public_subnet_objects
+  value       = [for subnet in module.vpc.public_subnet_objects : subnet.id]
 }
 
-output "private_subnet_objects" {
+output "private_subnet_ids" {
   description = "A list of all private subnets, containing the full objects."
-  value       = module.vpc.private_subnet_objects
+  value       = [for subnet in module.vpc.private_subnet_objects : subnet.id]
 }
 
 output "public_route_table_id" {
