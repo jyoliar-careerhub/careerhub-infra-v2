@@ -1,5 +1,3 @@
-# provider "aws" {
-# }
 resource "aws_vpc" "this" {
   instance_tenancy     = var.instance_tenancy
   enable_dns_hostnames = var.enable_dns_hostnames
