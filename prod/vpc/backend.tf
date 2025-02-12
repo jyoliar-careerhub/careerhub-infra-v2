@@ -1,8 +1,10 @@
 terraform {
-  backend "remote" {
+  cloud {
     organization = "jyoliar-careerhub"
     workspaces {
-      name = "prod-vpc"
+      tags = {
+        infra = "vpc"
+      }
     }
   }
 }
