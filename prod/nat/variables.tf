@@ -5,7 +5,3 @@ variable "env" {
 variable "region" {
   type = string
 }
-
-variable "organization" {
-  type = string
-}
