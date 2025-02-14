@@ -7,10 +7,14 @@ data "tfe_organizations" "this" {
   }
 }
 
-data "tfe_outputs" "this" {
+data "terraform_remote_state" "this" {
   for_each = toset(var.workspaces)
 
-  organization = data.tfe_organizations.this.names[0]
-  workspace    = each.value
+  backend = "remote"
+  config = {
+    organization = data.tfe_organizations.this.names[0]
+    workspaces = {
+      name = each.value
+    }
+  }
 }
-
