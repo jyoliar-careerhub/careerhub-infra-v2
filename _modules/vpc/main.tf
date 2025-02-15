@@ -21,7 +21,7 @@ resource "aws_internet_gateway" "this" {
 }
 
 resource "aws_subnet" "public" {
-  for_each = { for subnet in var.public_subnets : subnet.cidr_block => subnet }
+  for_each = { for public_subnet in var.public_subnets : public_subnet.cidr_block => public_subnet }
 
   vpc_id                  = aws_vpc.this.id
   cidr_block              = each.value.cidr_block
@@ -65,7 +65,7 @@ resource "aws_route" "public_internet_gateway" {
 }
 
 resource "aws_subnet" "private" {
-  for_each = { for subnet in var.private_subnets : subnet.cidr_block => subnet }
+  for_each = { for private_subnet in var.private_subnets : private_subnet.cidr_block => private_subnet }
 
   vpc_id            = aws_vpc.this.id
   cidr_block        = each.value.cidr_block
