@@ -122,7 +122,7 @@ resource "aws_security_group" "eks_node_sg" {
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
-    cidr_blocks = [local.network_output.vpc_cidr_block]
+    cidr_blocks = [data.aws_vpc.this.cidr_block]
   }
 
   # 외부에서의 SSH 접근 허용 (TCP 22)

@@ -28,8 +28,7 @@ variable "instance_types" {
 }
 
 variable "ami_type" {
-  type    = string
-  default = "AL2023_ARM_64_STANDARD"
+  type = string
 }
 
 variable "update_config" {
