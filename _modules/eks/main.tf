@@ -20,7 +20,7 @@ resource "aws_iam_role" "eks" {
 
 resource "aws_iam_role_policy_attachment" "AmazonEKSClusterPolicy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
-  role       = aws_iam_role.eks_cluster.name
+  role       = aws_iam_role.eks.name
 }
 
 
@@ -40,7 +40,7 @@ resource "aws_eks_cluster" "this" {
 
     subnet_ids = var.subnet_ids
     security_group_ids = [
-      aws_security_group.eks_cluster_sg.id,
+      aws_security_group.eks.id,
     ]
   }
 
