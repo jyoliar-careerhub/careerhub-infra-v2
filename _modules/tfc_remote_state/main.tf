@@ -7,6 +7,8 @@ data "tfe_organizations" "this" {
   }
 }
 
+
+
 data "terraform_remote_state" "this" {
   for_each = toset(var.workspaces)
 

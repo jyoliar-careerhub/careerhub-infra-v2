@@ -23,3 +23,18 @@ module "vpc" {
     }
   ]
 }
+
+module "prevent_destroy" {
+  source = "../../_modules/tfc_prevent_destroy"
+
+  depends_on = [module.vpc]
+}
+output "ws_data" {
+  value = module.prevent_destroy.ws_data
+}
+output "ws_name" {
+  value = module.prevent_destroy.ws_name
+}
+output "terraform_data" {
+  value = module.prevent_destroy.terraform_data
+}
