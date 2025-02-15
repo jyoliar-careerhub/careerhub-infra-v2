@@ -31,7 +31,7 @@ variable "map_public_ip_on_launch" {
 variable "public_subnets" {
   type = list(object({
     cidr_block        = string
-    availability_zone = optional(string)
+    availability_zone = string
   }))
 }
 
@@ -44,7 +44,7 @@ variable "public_subnet_suffix" {
 variable "private_subnets" {
   type = list(object({
     cidr_block        = string
-    availability_zone = optional(string)
+    availability_zone = string
   }))
 }
 
