@@ -83,6 +83,13 @@ resource "aws_iam_role_policy_attachment" "AmazonEC2ContainerRegistryReadOnly" {
   role       = aws_iam_role.node_group.name
 }
 
+#ssm 정책 추가
+resource "aws_iam_role_policy_attachment" "AmazonSSMManagedInstanceCore" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+  role       = aws_iam_role.node_group.name
+}
+#이 정책은 위의 AmazonEC2ContainerRegistryReadOnly 정책과 동일한 권한을 가지는 것으로 보입니다.
+#검토 후 삭제하겠습니다.
 data "aws_iam_policy_document" "ecr_readonly" {
   statement {
     actions = [
