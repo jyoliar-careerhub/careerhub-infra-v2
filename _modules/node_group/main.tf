@@ -19,10 +19,6 @@ resource "aws_secretsmanager_secret_version" "private_key" {
   secret_string = tls_private_key.this.private_key_pem
 }
 
-data "aws_eks_cluster" "this" {
-  name = var.cluster_name
-}
-
 resource "aws_eks_node_group" "careerhub" {
   cluster_name    = var.cluster_name
   node_group_name = var.name
@@ -36,7 +32,7 @@ resource "aws_eks_node_group" "careerhub" {
   }
 
   instance_types = var.instance_types
-  version        = data.aws_eks_cluster.this.version
+  version        = var.eks_version
 
   ami_type = var.ami_type
 

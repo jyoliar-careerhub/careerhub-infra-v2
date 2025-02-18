@@ -5,3 +5,7 @@ output "eks_cluster_name" {
 output "eks_oidc_provider_arn" {
   value = aws_iam_openid_connect_provider.this.arn
 }
+
+output "eks_version" {
+  value = aws_eks_cluster.this.version
+}
