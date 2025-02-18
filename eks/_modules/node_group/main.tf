@@ -20,11 +20,11 @@ resource "aws_secretsmanager_secret_version" "private_key" {
 }
 
 resource "aws_eks_node_group" "careerhub" {
-  cluster_name    = var.cluster_name
-  node_group_name = var.name
-  node_role_arn   = aws_iam_role.node_group.arn
-  subnet_ids      = var.subnet_ids
+  cluster_name  = var.cluster_name
+  node_role_arn = aws_iam_role.node_group.arn
+  subnet_ids    = var.subnet_ids
 
+  node_group_name_prefix = "${var.name}-"
   scaling_config {
     desired_size = var.desired_size
     max_size     = var.max_size
