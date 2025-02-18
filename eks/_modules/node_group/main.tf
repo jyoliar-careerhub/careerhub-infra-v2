@@ -128,15 +128,6 @@ resource "aws_security_group" "eks_node_sg" {
     cidr_blocks = [data.aws_vpc.this.cidr_block]
   }
 
-  # 외부에서의 SSH 접근 허용 (TCP 22)
-  ingress {
-    description = "Allow SSH access from outside"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
   # EKS 노드 간 통신 허용
   ingress {
     description = "Allow node-to-node communication"
