@@ -9,14 +9,7 @@ data "aws_vpc" "this" {
 resource "aws_security_group" "nat_instance_sg" {
   vpc_id      = data.aws_subnet.public.vpc_id
   name        = "${var.name}-sg"
-  description = "Allow SSH and NAT traffic"
-
-  ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+  description = "Security group for NAT instance"
 
   ingress {
     from_port   = 0
