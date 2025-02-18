@@ -1,5 +1,5 @@
 module "nat" {
-  source = "../../_modules/nat"
+  source = "../_modules/nat"
 
   name = "${var.env}-careerhub-nat"
 

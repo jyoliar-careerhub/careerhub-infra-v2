@@ -22,7 +22,7 @@ data "aws_availability_zone" "this" {
 }
 
 module "vpc" {
-  source = "../../_modules/vpc"
+  source = "../_modules/vpc"
   name   = "${var.env}-careerhub"
 
   vpc_cidr_block = local.vpc_cidr_block

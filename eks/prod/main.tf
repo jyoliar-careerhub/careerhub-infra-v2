@@ -21,7 +21,7 @@ locals {
 
 
 module "eks" {
-  source = "../../_modules/eks"
+  source = "../_modules/eks"
 
   name       = "${var.env}-eks"
   subnet_ids = local.vpc_outputs.public_subnet_ids
@@ -30,7 +30,7 @@ module "eks" {
 
 
 module "node_group" {
-  source = "../../_modules/node_group"
+  source = "../_modules/node_group"
 
   for_each = local.node_group
 
@@ -55,7 +55,7 @@ data "aws_iam_role" "terraform" {
 }
 
 module "eks_access" {
-  source = "../../_modules/eks_access"
+  source = "../_modules/eks_access"
 
   cluster_name = module.eks.eks_cluster_name
 
@@ -64,7 +64,7 @@ module "eks_access" {
 
 
 # module "role_for_sa" {
-#   source = "../../_modules/role_for_sa"
+#   source = "../_modules/role_for_sa"
 
 #   eks_oidc_provider_arn = module.eks.eks_oidc_provider_arn
 #   namespace             = "kube-system"
