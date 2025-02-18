@@ -60,9 +60,9 @@ resource "aws_instance" "nat" {
   key_name      = aws_key_pair.this.key_name
   subnet_id     = var.public_subnet_id
 
-  source_dest_check = false
-
-  user_data = <<EOT
+  source_dest_check    = false
+  iam_instance_profile = aws_iam_instance_profile.nat.name
+  user_data            = <<EOT
 #!/bin/bash
 
 echo "*** Install iptables and start ***"
@@ -93,4 +93,32 @@ resource "aws_route" "nat_gateway" {
   route_table_id         = var.route_table_id
   destination_cidr_block = "0.0.0.0/0"
   network_interface_id   = aws_instance.nat.primary_network_interface_id
+}
+
+resource "aws_iam_instance_profile" "nat" {
+  name = "${var.name}-instance-profile"
+
+  role = aws_iam_role.nat.name
+}
+
+resource "aws_iam_role" "nat" {
+  name = "${var.name}-role"
+
+  assume_role_policy = jsonencode({
+    Statement = [{
+      Action = "sts:AssumeRole"
+      Effect = "Allow"
+      Principal = {
+        Service = "ec2.amazonaws.com"
+      }
+    }]
+    Version = "2012-10-17"
+  })
+}
+
+
+#ssm 정책 추가
+resource "aws_iam_role_policy_attachment" "AmazonSSMManagedInstanceCore" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+  role       = aws_iam_role.nat.name
 }
