@@ -1,5 +1,5 @@
 module "eks_access" {
-  source = "../../_modules/eks_access"
+  source = "../../eks/_modules/eks_access"
 
   cluster_name = local.eks_outputs.eks_cluster_name
 
