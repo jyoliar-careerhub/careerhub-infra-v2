@@ -3,9 +3,9 @@ output "vpc_id" {
   value       = var.vpc_id
 }
 
-output "public_subnet_objects" {
+output "public_subnet_ids" {
   description = "A list of all public subnets, containing the full objects."
-  value       = aws_subnet.public
+  value       = [for subnet in aws_subnet.public : subnet.id]
 }
 
 output "public_route_table_id" {
@@ -13,12 +13,16 @@ output "public_route_table_id" {
   value       = var.public_route_table_id
 }
 
-output "private_subnet_objects" {
+output "private_subnet_ids" {
   description = "A list of all private subnets, containing the full objects."
-  value       = aws_subnet.private
+  value       = [for subnet in aws_subnet.private : subnet.id]
 }
+
 
 output "private_route_table_id" {
   description = "The ID of the private route table"
   value       = var.private_route_table_id
 }
+
+
+
