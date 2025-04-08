@@ -8,7 +8,7 @@ locals {
     f = 6
   }
 
-  total_cidr_block = cidrsubnet(local.vpc_outputs.vpc_cidr_block, 4, 1)
+  total_cidr_block = cidrsubnet(local.vpc_outputs.vpc_cidr_block, 4, 0)
 }
 
 data "aws_availability_zones" "this" {
