@@ -5,6 +5,11 @@ variable "name" {
 variable "cluster_name" {
   type = string
 }
+
+variable "eks_version" {
+  type = string
+}
+
 variable "vpc_id" {
   type = string
 }

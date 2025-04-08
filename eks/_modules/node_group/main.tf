@@ -19,16 +19,12 @@ resource "aws_secretsmanager_secret_version" "private_key" {
   secret_string = tls_private_key.this.private_key_pem
 }
 
-data "aws_eks_cluster" "this" {
-  name = var.cluster_name
-}
-
 resource "aws_eks_node_group" "careerhub" {
-  cluster_name    = var.cluster_name
-  node_group_name = var.name
-  node_role_arn   = aws_iam_role.node_group.arn
-  subnet_ids      = var.subnet_ids
+  cluster_name  = var.cluster_name
+  node_role_arn = aws_iam_role.node_group.arn
+  subnet_ids    = var.subnet_ids
 
+  node_group_name_prefix = "${var.name}-"
   scaling_config {
     desired_size = var.desired_size
     max_size     = var.max_size
@@ -36,7 +32,7 @@ resource "aws_eks_node_group" "careerhub" {
   }
 
   instance_types = var.instance_types
-  version        = data.aws_eks_cluster.this.version
+  version        = var.eks_version
 
   ami_type = var.ami_type
 
@@ -87,6 +83,13 @@ resource "aws_iam_role_policy_attachment" "AmazonEC2ContainerRegistryReadOnly" {
   role       = aws_iam_role.node_group.name
 }
 
+#ssm 정책 추가
+resource "aws_iam_role_policy_attachment" "AmazonSSMManagedInstanceCore" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+  role       = aws_iam_role.node_group.name
+}
+#이 정책은 위의 AmazonEC2ContainerRegistryReadOnly 정책과 동일한 권한을 가지는 것으로 보입니다.
+#검토 후 삭제하겠습니다.
 data "aws_iam_policy_document" "ecr_readonly" {
   statement {
     actions = [
@@ -123,15 +126,6 @@ resource "aws_security_group" "eks_node_sg" {
     to_port     = 443
     protocol    = "tcp"
     cidr_blocks = [data.aws_vpc.this.cidr_block]
-  }
-
-  # 외부에서의 SSH 접근 허용 (TCP 22)
-  ingress {
-    description = "Allow SSH access from outside"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
   }
 
   # EKS 노드 간 통신 허용
