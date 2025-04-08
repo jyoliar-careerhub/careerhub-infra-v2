@@ -1,23 +1,4 @@
-resource "tls_private_key" "this" {
-  algorithm = "RSA"
-  rsa_bits  = 4096
-}
 
-resource "aws_key_pair" "this" {
-  key_name   = "${var.name}-keypair"
-  public_key = tls_private_key.this.public_key_openssh
-}
-
-resource "aws_secretsmanager_secret" "private_key" {
-  name                           = "${var.name}-private-key"
-  recovery_window_in_days        = 0
-  force_overwrite_replica_secret = true
-}
-
-resource "aws_secretsmanager_secret_version" "private_key" {
-  secret_id     = aws_secretsmanager_secret.private_key.id
-  secret_string = tls_private_key.this.private_key_pem
-}
 
 resource "aws_eks_node_group" "careerhub" {
   cluster_name  = var.cluster_name
@@ -38,10 +19,6 @@ resource "aws_eks_node_group" "careerhub" {
 
   update_config {
     max_unavailable = var.update_config
-  }
-
-  remote_access {
-    ec2_ssh_key = aws_key_pair.this.key_name
   }
 
   # Ensure that IAM Role permissions are created before and deleted after EKS Node Group handling.
