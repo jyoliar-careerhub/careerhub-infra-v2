@@ -5,12 +5,12 @@ output "vpc_id" {
 
 output "public_subnet_ids" {
   description = "A list of all public subnets, containing the full objects."
-  value       = [for subnet in module.subnets.public_subnet_objects : subnet.id]
+  value       = module.subnets.public_subnet_ids
 }
 
 output "private_subnet_ids" {
   description = "A list of all private subnets, containing the full objects."
-  value       = [for subnet in module.subnets.private_subnet_objects : subnet.id]
+  value       = module.subnets.private_subnet_ids
 }
 
 output "public_route_table_id" {
