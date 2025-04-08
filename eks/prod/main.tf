@@ -24,8 +24,8 @@ module "eks" {
   source = "../_modules/eks"
 
   name       = "${var.env}-eks"
-  subnet_ids = local.vpc_outputs.public_subnet_ids
-  vpc_id     = local.vpc_outputs.vpc_id
+  subnet_ids = local.eks_subnets_outputs.public_subnet_ids
+  vpc_id     = local.eks_subnets_outputs.vpc_id
 }
 
 
@@ -34,8 +34,8 @@ module "node_group" {
 
   for_each = local.node_group
 
-  vpc_id       = local.vpc_outputs.vpc_id
-  subnet_ids   = local.vpc_outputs.public_subnet_ids
+  vpc_id       = local.eks_subnets_outputs.vpc_id
+  subnet_ids   = local.eks_subnets_outputs.public_subnet_ids
   cluster_name = module.eks.eks_cluster_name
   eks_version  = module.eks.eks_version
 

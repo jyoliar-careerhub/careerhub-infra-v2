@@ -1,13 +1,13 @@
 locals {
-  vpc_ws = "${var.env}-vpc"
+  eks_subnets_ws = "${var.env}-eks-subnets"
 }
 
 module "remote_state" {
   source = "../../_modules/tfc_remote_state"
 
-  workspaces = [local.vpc_ws]
+  workspaces = [local.eks_subnets_ws]
 }
 
 locals {
-  vpc_outputs = module.remote_state.outputs[local.vpc_ws]
+  eks_subnets_outputs = module.remote_state.outputs[local.eks_subnets_ws]
 }
