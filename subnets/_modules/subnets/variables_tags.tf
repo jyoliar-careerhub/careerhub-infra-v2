@@ -10,6 +10,18 @@ variable "vpc_tags" {
   default     = {}
 }
 
+variable "public_subnet_tags" {
+  description = "Additional tags for the public subnets"
+  type        = map(string)
+  default     = {}
+}
+
+variable "private_subnet_tags" {
+  description = "Additional tags for the private subnets"
+  type        = map(string)
+  default     = {}
+
+}
 
 variable "igw_tags" {
   description = "Additional tags for the internet gateway"
