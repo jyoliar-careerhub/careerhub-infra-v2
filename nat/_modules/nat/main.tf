@@ -26,31 +26,10 @@ resource "aws_security_group" "nat_instance_sg" {
   }
 }
 
-resource "tls_private_key" "this" {
-  algorithm = "RSA"
-  rsa_bits  = 4096
-}
-
-resource "aws_key_pair" "this" {
-  key_name   = "${var.name}-keypair"
-  public_key = tls_private_key.this.public_key_openssh
-}
-
-resource "aws_secretsmanager_secret" "nat_private_key" {
-  name                    = "${var.name}-private-key"
-  recovery_window_in_days = 0
-}
-
-resource "aws_secretsmanager_secret_version" "nat_private_key_version" {
-  secret_id     = aws_secretsmanager_secret.nat_private_key.id
-  secret_string = tls_private_key.this.private_key_pem
-}
-
 resource "aws_instance" "nat" {
   ami = "ami-00c2fe3c2e5f11a2b" //Amazon Linux 2023 AMI arm64
 
   instance_type = "t4g.micro"
-  key_name      = aws_key_pair.this.key_name
   subnet_id     = var.public_subnet_id
 
   source_dest_check    = false
