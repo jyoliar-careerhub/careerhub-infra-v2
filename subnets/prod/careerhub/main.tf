@@ -23,7 +23,7 @@ data "aws_availability_zone" "this" {
 
 module "subnets" {
   source = "../../_modules/subnets"
-  name   = "${var.env}-eks"
+  name   = "${var.env}-careerhub"
 
   vpc_id                 = local.vpc_outputs.vpc_id
   public_route_table_id  = local.vpc_outputs.public_route_table_id
