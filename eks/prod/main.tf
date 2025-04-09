@@ -59,9 +59,8 @@ module "eks_access" {
 
   cluster_name = module.eks.eks_cluster_name
 
-  cluster_admin_arns = [data.aws_iam_role.terraform.arn]
+  cluster_admin_arns = concat(var.cluster_admin_arns, [data.aws_iam_role.terraform.arn])
 }
-
 
 # module "role_for_sa" {
 #   source = "../_modules/role_for_sa"
