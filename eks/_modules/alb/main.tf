@@ -1,5 +1,13 @@
+resource "random_string" "bucket_suffix" {
+  length  = 6
+  upper   = false
+  lower   = true
+  special = false
+}
+
+
 resource "aws_s3_bucket" "lb_logs" {
-  bucket        = "${var.name}-logs"
+  bucket        = "${var.name}-logs-${random_string.bucket_suffix.result}"
   force_destroy = true
 
 
@@ -73,7 +81,7 @@ resource "aws_lb_target_group" "this" {
 }
 
 resource "aws_lb_listener" "https" {
-  count = (!var.is_ssl_redirect) ? 1 : 0
+  count = var.is_https ? 1 : 0
 
   load_balancer_arn = aws_lb.this.arn
   port              = "443"
