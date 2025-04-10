@@ -5,28 +5,6 @@ resource "random_string" "bucket_suffix" {
   special = false
 }
 
-
-resource "aws_s3_bucket" "lb_logs" {
-  bucket        = "${var.name}-logs-${random_string.bucket_suffix.result}"
-  force_destroy = true
-
-
-  tags = var.logs_bucket_tags
-}
-
-resource "aws_s3_bucket_lifecycle_configuration" "lb_logs" {
-  bucket = aws_s3_bucket.lb_logs.id
-
-  rule {
-    id     = "expiration"
-    status = "Enabled"
-
-    expiration {
-      days = 3
-    }
-  }
-}
-
 resource "aws_security_group" "this" {
   name   = "${var.name}-sg"
   vpc_id = var.vpc_id
@@ -54,6 +32,27 @@ resource "aws_security_group_rule" "allow_all_https" {
   cidr_blocks       = ["0.0.0.0/0"]
 }
 
+resource "aws_s3_bucket" "lb_logs" {
+  bucket        = "${var.name}-logs-${random_string.bucket_suffix.result}"
+  force_destroy = true
+
+
+  tags = var.logs_bucket_tags
+}
+
+resource "aws_s3_bucket_lifecycle_configuration" "lb_logs" {
+  bucket = aws_s3_bucket.lb_logs.id
+
+  rule {
+    id     = "expiration"
+    status = "Enabled"
+
+    expiration {
+      days = 3
+    }
+  }
+}
+
 resource "aws_lb" "this" {
   name               = var.name
   internal           = var.is_internal
@@ -69,6 +68,29 @@ resource "aws_lb" "this" {
 
   tags = var.alb_tags
 }
+
+resource "aws_s3_bucket_policy" "lb_logs" {
+  bucket = aws_s3_bucket.lb_logs.id
+  policy = data.aws_iam_policy_document.lb_logs.json
+}
+
+data "aws_iam_policy_document" "lb_logs" {
+  statement {
+    principals {
+      type        = "AWS"
+      identifiers = [aws_lb.this.arn]
+    }
+
+    actions = [
+      "s3:PutObject",
+    ]
+
+    resources = [
+      "${aws_s3_bucket.lb_logs.arn}/*",
+    ]
+  }
+}
+
 
 resource "aws_lb_target_group" "this" {
   name        = "${var.name}-tg"
