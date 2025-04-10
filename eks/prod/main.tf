@@ -62,6 +62,21 @@ module "eks_access" {
   cluster_admin_arns = concat(var.cluster_admin_arns, [data.aws_iam_role.terraform.arn])
 }
 
+
+module "eks_alb" {
+  source = "../_modules/alb"
+
+  name       = "${var.env}-eks-alb"
+  vpc_id     = local.eks_subnets_outputs.vpc_id
+  subnet_ids = local.eks_subnets_outputs.public_subnet_ids
+
+  is_internal      = false
+  is_https         = true
+  is_ssl_redirect  = true
+  allow_access_all = true
+}
+
+
 # module "role_for_sa" {
 #   source = "../_modules/role_for_sa"
 
