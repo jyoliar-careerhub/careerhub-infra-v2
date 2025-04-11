@@ -97,11 +97,26 @@ resource "aws_route53_record" "alb_record" {
   }
 }
 
+data "http" "aws_lbc_policy" {
+  url = "https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v2.11.0/docs/install/iam_policy.json"
+}
 
-# module "role_for_sa" {
-#   source = "../_modules/role_for_sa"
+resource "aws_iam_policy" "aws_lbc" {
+  name        = "AWSLoadBalancerControllerIAMPolicy"
+  description = "IAM policy for AWS Load Balancer Controller"
 
-#   eks_oidc_provider_arn = module.eks.eks_oidc_provider_arn
-#   namespace             = "kube-system"
-#   service_account_name  = "aws-load-balancer-controller"
-# }
+  policy = data.http.aws_lbc_policy.body
+}
+
+module "role_for_sa" {
+  source = "../_modules/role_for_sa"
+
+  eks_oidc_provider_arn = module.eks.eks_oidc_provider_arn
+  namespace             = var.aws_lbc_ns
+  service_account_name  = var.aws_lbc_sa
+}
+
+resource "aws_iam_role_policy_attachment" "this" {
+  role       = module.role_for_sa.role_name
+  policy_arn = aws_iam_policy.aws_lbc.arn
+}
