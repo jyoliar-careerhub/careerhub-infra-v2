@@ -21,3 +21,11 @@ variable "hosted_zone_name" {
 variable "alb_domain" {
   type = string
 }
+
+variable "aws_lbc_ns" {
+  type = string
+}
+
+variable "aws_lbc_sa" {
+  type = string
+}
