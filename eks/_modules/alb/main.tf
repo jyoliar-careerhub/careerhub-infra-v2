@@ -53,7 +53,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "lb_logs" {
   }
 }
 
-data "aws_caller_identity" "current" {}
+data "aws_elb_service_account" "this" {}
 
 resource "aws_s3_bucket_policy" "lb_logs" {
   bucket = aws_s3_bucket.lb_logs.id
@@ -66,7 +66,7 @@ resource "aws_s3_bucket_policy" "lb_logs" {
         "Action" : "s3:PutObject",
         "Resource" : "${aws_s3_bucket.lb_logs.arn}/*",
         "Principal" : {
-          "AWS" : "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+          "AWS" : "${data.aws_elb_service_account.this.arn}"
         }
       },
       {
