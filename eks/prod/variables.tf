@@ -13,3 +13,11 @@ variable "cluster_admin_arns" {
 variable "acm_cert_domain" {
   type = string
 }
+
+variable "hosted_zone_name" {
+  type = string
+}
+
+variable "alb_domain" {
+  type = string
+}
