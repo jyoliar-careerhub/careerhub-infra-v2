@@ -62,13 +62,18 @@ module "eks_access" {
   cluster_admin_arns = concat(var.cluster_admin_arns, [data.aws_iam_role.terraform.arn])
 }
 
+data "aws_acm_certificate" "issued" {
+  domain   = var.acm_cert_domain
+  statuses = ["ISSUED"]
+}
 
 module "eks_alb" {
   source = "../_modules/alb"
 
-  name       = "${var.env}-eks-alb"
-  vpc_id     = local.eks_subnets_outputs.vpc_id
-  subnet_ids = local.eks_subnets_outputs.public_subnet_ids
+  name            = "${var.env}-eks-alb"
+  vpc_id          = local.eks_subnets_outputs.vpc_id
+  subnet_ids      = local.eks_subnets_outputs.public_subnet_ids
+  certificate_arn = data.aws_acm_certificate.issued.arn
 
   is_internal      = false
   is_https         = true
