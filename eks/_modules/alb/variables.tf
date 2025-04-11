@@ -31,6 +31,16 @@ variable "is_ssl_redirect" {
   }
 }
 
+variable "certificate_arn" {
+  type    = string
+  default = ""
+
+  validation {
+    condition     = !var.is_https || length(var.certificate_arn) > 0
+    error_message = "certificate_arn is required when is_https is true."
+  }
+}
+
 #아래 변수들은 default 값이 존재
 variable "target_port" {
   type    = number
