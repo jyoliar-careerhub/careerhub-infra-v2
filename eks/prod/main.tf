@@ -81,6 +81,22 @@ module "eks_alb" {
   allow_access_all = true
 }
 
+data "aws_route53_zone" "this" {
+  name = var.hosted_zone_name
+}
+
+resource "aws_route53_record" "alb_record" {
+  zone_id = data.aws_route53_zone.this.zone_id
+  name    = var.alb_domain
+  type    = "A"
+
+  alias {
+    name                   = module.eks_alb.alb_dns_name
+    zone_id                = module.eks_alb.alb_zone_id
+    evaluate_target_health = true
+  }
+}
+
 
 # module "role_for_sa" {
 #   source = "../_modules/role_for_sa"
