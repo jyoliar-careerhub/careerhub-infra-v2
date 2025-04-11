@@ -53,6 +53,58 @@ resource "aws_s3_bucket_lifecycle_configuration" "lb_logs" {
   }
 }
 
+data "aws_caller_identity" "current" {}
+
+resource "aws_s3_bucket_policy" "lb_logs" {
+  bucket = aws_s3_bucket.lb_logs.id
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Sid" : "AllowELBRootAccount",
+        "Effect" : "Allow",
+        "Action" : "s3:PutObject",
+        "Resource" : "${aws_s3_bucket.lb_logs.arn}/*",
+        "Principal" : {
+          "AWS" : "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+        }
+      },
+      {
+        "Sid" : "AWSLogDeliveryWrite",
+        "Effect" : "Allow",
+        "Action" : "s3:PutObject",
+        "Resource" : "${aws_s3_bucket.lb_logs.arn}/*",
+        "Condition" : {
+          "StringEquals" : {
+            "s3:x-amz-acl" : "bucket-owner-full-control"
+          }
+        },
+        "Principal" : {
+          "Service" : "delivery.logs.amazonaws.com"
+        }
+      },
+      {
+        "Sid" : "AWSLogDeliveryAclCheck",
+        "Effect" : "Allow",
+        "Action" : "s3:GetBucketAcl",
+        "Resource" : "${aws_s3_bucket.lb_logs.arn}",
+        "Principal" : {
+          "Service" : "delivery.logs.amazonaws.com"
+        }
+      },
+      {
+        "Sid" : "AllowALBAccess",
+        "Effect" : "Allow",
+        "Action" : "s3:PutObject",
+        "Resource" : "${aws_s3_bucket.lb_logs.arn}/*",
+        "Principal" : {
+          "Service" : "elasticloadbalancing.amazonaws.com"
+        }
+      }
+    ]
+  })
+}
+
 resource "aws_lb" "this" {
   name               = var.name
   internal           = var.is_internal
@@ -67,57 +119,8 @@ resource "aws_lb" "this" {
   }
 
   tags = var.alb_tags
-}
-data "aws_caller_identity" "current" {}
 
-resource "aws_s3_bucket_policy" "lb_logs" {
-  bucket = aws_s3_bucket.lb_logs.id
-  policy = jsonencode({
-    "Version" : "2012-10-17",
-    "Statement" : [
-      {
-        "Sid" : "AllowELBRootAccount",
-        "Effect" : "Allow",
-        "Action" : "s3:PutObject",
-        "Resource" : "${aws_lb.this.arn}/*",
-        "Principal" : {
-          "AWS" : "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
-        }
-      },
-      {
-        "Sid" : "AWSLogDeliveryWrite",
-        "Effect" : "Allow",
-        "Action" : "s3:PutObject",
-        "Resource" : "${aws_lb.this.arn}/*",
-        "Condition" : {
-          "StringEquals" : {
-            "s3:x-amz-acl" : "bucket-owner-full-control"
-          }
-        },
-        "Principal" : {
-          "Service" : "delivery.logs.amazonaws.com"
-        }
-      },
-      {
-        "Sid" : "AWSLogDeliveryAclCheck",
-        "Effect" : "Allow",
-        "Action" : "s3:GetBucketAcl",
-        "Resource" : "${aws_lb.this.arn}",
-        "Principal" : {
-          "Service" : "delivery.logs.amazonaws.com"
-        }
-      },
-      {
-        "Sid" : "AllowALBAccess",
-        "Effect" : "Allow",
-        "Action" : "s3:PutObject",
-        "Resource" : "${aws_lb.this.arn}/*",
-        "Principal" : {
-          "Service" : "elasticloadbalancing.amazonaws.com"
-        }
-      }
-    ]
-  })
+  depends_on = [aws_s3_bucket.lb_logs]
 }
 
 resource "aws_lb_target_group" "this" {
