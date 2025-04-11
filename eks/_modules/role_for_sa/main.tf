@@ -3,7 +3,7 @@ locals {
   oidc_provider_url = join("/", slice(local.temps, 1, length(local.temps)))
 }
 resource "aws_iam_role" "this" {
-  name = "${var.namespace}-${var.service_account_name}-eks-role"
+  name = var.name
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [

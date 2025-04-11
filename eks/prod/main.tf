@@ -111,6 +111,7 @@ resource "aws_iam_policy" "aws_lbc" {
 module "role_for_sa" {
   source = "../_modules/role_for_sa"
 
+  name                  = "${var.env}-aws-lbc"
   eks_oidc_provider_arn = module.eks.eks_oidc_provider_arn
   namespace             = var.aws_lbc_ns
   service_account_name  = var.aws_lbc_sa
