@@ -1,11 +1,18 @@
+# Launch Template 생성
+resource "aws_launch_template" "eks_worker" {
+  name_prefix = "${var.name}-"
+  image_id    = var.ami_type
 
+  network_interfaces {
+    security_groups = [aws_security_group.eks_node.id]
+  }
+}
 
 resource "aws_eks_node_group" "careerhub" {
   cluster_name  = var.cluster_name
   node_role_arn = aws_iam_role.node_group.arn
   subnet_ids    = var.subnet_ids
 
-  node_group_name_prefix = "${var.name}-"
   scaling_config {
     desired_size = var.desired_size
     max_size     = var.max_size
@@ -15,16 +22,13 @@ resource "aws_eks_node_group" "careerhub" {
   instance_types = var.instance_types
   version        = var.eks_version
 
-  ami_type = var.ami_type
-
   update_config {
     max_unavailable = var.update_config
   }
 
-  remote_access {
-    source_security_group_ids = [
-      aws_security_group.eks_node.id,
-    ]
+  launch_template {
+    id      = aws_launch_template.eks_worker.id
+    version = "$Latest"
   }
 
   # Ensure that IAM Role permissions are created before and deleted after EKS Node Group handling.
