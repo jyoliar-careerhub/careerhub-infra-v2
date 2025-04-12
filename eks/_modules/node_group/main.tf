@@ -21,6 +21,12 @@ resource "aws_eks_node_group" "careerhub" {
     max_unavailable = var.update_config
   }
 
+  remote_access {
+    source_security_group_ids = [
+      aws_security_group.eks_node.id,
+    ]
+  }
+
   # Ensure that IAM Role permissions are created before and deleted after EKS Node Group handling.
   # Otherwise, EKS will not be able to properly delete EC2 Instances and Elastic Network Interfaces.
   depends_on = [
@@ -91,33 +97,22 @@ data "aws_vpc" "this" {
 }
 
 # # EKS 노드 그룹 보안 그룹
-resource "aws_security_group" "eks_node_sg" {
+resource "aws_security_group" "eks_node" {
   name        = "${var.name}-sg"
   description = "Security group for EKS Worker Nodes"
   vpc_id      = var.vpc_id
+}
 
-  # 노드 -> 클러스터로의 통신 허용 (TCP 443)
-  ingress {
-    description = "Allow cluster communication"
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = [data.aws_vpc.this.cidr_block]
-  }
+resource "aws_security_group" "allowed_alb" {
+  name   = "${var.name}-allowed-alb-sg"
+  vpc_id = var.vpc_id
+}
 
-  # EKS 노드 간 통신 허용
-  ingress {
-    description = "Allow node-to-node communication"
-    from_port   = 0
-    to_port     = 65535
-    protocol    = "tcp"
-    cidr_blocks = [data.aws_vpc.this.cidr_block]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+resource "aws_security_group_rule" "allow_from_alb" {
+  type                     = "ingress"
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = "-1"
+  security_group_id        = aws_security_group.eks_node.id
+  source_security_group_id = aws_security_group.allowed_alb.id
 }
