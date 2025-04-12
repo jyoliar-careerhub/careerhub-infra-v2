@@ -1,7 +1,6 @@
 # Launch Template 생성
 resource "aws_launch_template" "eks_worker" {
   name_prefix = "${var.name}-"
-  image_id    = var.ami_type
 
   network_interfaces {
     security_groups = [aws_security_group.eks_node.id]
@@ -20,6 +19,7 @@ resource "aws_eks_node_group" "careerhub" {
   }
 
   instance_types = var.instance_types
+  ami_type       = var.ami_type
   version        = var.eks_version
 
   update_config {
