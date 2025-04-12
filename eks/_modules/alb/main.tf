@@ -32,6 +32,15 @@ resource "aws_security_group_rule" "allow_all_https" {
   cidr_blocks       = ["0.0.0.0/0"]
 }
 
+resource "aws_security_group_rule" "egress" {
+  security_group_id = aws_security_group.this.id
+  type              = "egress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  cidr_blocks       = ["0.0.0.0/0"]
+}
+
 resource "aws_s3_bucket" "lb_logs" {
   bucket        = "${var.name}-logs-${random_string.bucket_suffix.result}"
   force_destroy = true
