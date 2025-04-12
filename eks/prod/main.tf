@@ -70,10 +70,11 @@ data "aws_acm_certificate" "issued" {
 module "eks_alb" {
   source = "../_modules/alb"
 
-  name            = "${var.env}-eks-alb"
-  vpc_id          = local.eks_subnets_outputs.vpc_id
-  subnet_ids      = local.eks_subnets_outputs.public_subnet_ids
-  certificate_arn = data.aws_acm_certificate.issued.arn
+  name               = "${var.env}-eks-alb"
+  vpc_id             = local.eks_subnets_outputs.vpc_id
+  subnet_ids         = local.eks_subnets_outputs.public_subnet_ids
+  certificate_arn    = data.aws_acm_certificate.issued.arn
+  security_group_ids = [for node_group in module.node_group : node_group.allowed_alb_sg_id]
 
   is_internal      = false
   is_https         = true
