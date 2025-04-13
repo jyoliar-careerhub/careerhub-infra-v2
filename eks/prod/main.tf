@@ -77,10 +77,11 @@ module "eks_alb" {
   certificate_arn    = data.aws_acm_certificate.issued.arn
   security_group_ids = [for node_group in module.node_group : node_group.allowed_alb_sg_id]
 
-  is_internal      = false
-  is_https         = true
-  is_ssl_redirect  = true
-  allow_access_all = true
+  health_check_path = "/livez"
+  is_internal       = false
+  is_https          = true
+  is_ssl_redirect   = true
+  allow_access_all  = true
 }
 
 data "aws_route53_zone" "this" {

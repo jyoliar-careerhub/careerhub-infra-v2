@@ -139,6 +139,10 @@ resource "aws_lb_target_group" "this" {
   protocol    = var.target_protocol
   port        = var.target_port
 
+  health_check {
+    path = var.health_check_path
+  }
+
   tags = var.target_group_tags
 }
 

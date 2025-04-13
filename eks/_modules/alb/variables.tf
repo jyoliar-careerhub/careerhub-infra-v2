@@ -22,6 +22,10 @@ variable "is_https" {
   type = bool
 }
 
+variable "health_check_path" {
+  type = string
+}
+
 variable "is_ssl_redirect" {
   type = bool
 
