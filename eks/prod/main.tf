@@ -34,10 +34,11 @@ module "node_group" {
 
   for_each = local.node_group
 
-  vpc_id       = local.eks_subnets_outputs.vpc_id
-  subnet_ids   = local.eks_subnets_outputs.public_subnet_ids
-  cluster_name = module.eks.eks_cluster_name
-  eks_version  = module.eks.eks_version
+  vpc_id                     = local.eks_subnets_outputs.vpc_id
+  subnet_ids                 = local.eks_subnets_outputs.public_subnet_ids
+  cluster_name               = module.eks.eks_cluster_name
+  eks_version                = module.eks.eks_version
+  cluster_security_group_ids = module.eks.cluster_security_group_ids
 
   name           = "${var.env}-${each.value.ng_name}"
   min_size       = each.value.min_size
