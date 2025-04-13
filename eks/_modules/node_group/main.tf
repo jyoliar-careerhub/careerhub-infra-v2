@@ -1,12 +1,9 @@
 # Launch Template 생성
-data "aws_eks_cluster" "this" {
-  name = var.cluster_name
-}
 resource "aws_launch_template" "eks_worker" {
   name_prefix = "${var.name}-"
 
   network_interfaces {
-    security_groups = concat([aws_security_group.eks_node.id, ], [for vpc_config in data.aws_eks_cluster.this.vpc_config : vpc_config.cluster_security_group_id])
+    security_groups = concat([aws_security_group.eks_node.id, ], var.cluster_security_group_ids)
   }
 }
 
