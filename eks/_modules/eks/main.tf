@@ -45,6 +45,23 @@ resource "aws_security_group" "eks" {
   }
 }
 
+resource "aws_eks_addon" "vpc-cni" {
+  cluster_name  = aws_eks_cluster.this.name
+  addon_name    = "vpc-cni"
+  addon_version = "v1.19.2-eksbuild.1"
+
+  resolve_conflicts_on_create = "OVERWRITE"
+  resolve_conflicts_on_update = "OVERWRITE"
+
+  configuration_values = jsonencode({
+    env = {
+      ENABLE_PREFIX_DELEGATION = "true"
+      WARM_IP_TARGET           = "1"
+      MINIMUM_IP_TARGET        = "1"
+    }
+  })
+}
+
 resource "aws_eks_cluster" "this" {
   name = var.name
 
