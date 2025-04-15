@@ -100,6 +100,8 @@ resource "aws_route53_record" "alb_record" {
   }
 }
 
+
+### # AWS Load Balancer Controller
 data "http" "aws_lbc_policy" {
   url = "https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v2.11.0/docs/install/iam_policy.json"
 }
@@ -125,20 +127,7 @@ resource "aws_iam_role_policy_attachment" "this" {
   policy_arn = aws_iam_policy.aws_lbc.arn
 }
 
-locals {
-  argocd_git_repo_creds = ["/argocd_git_repo_creds/common-infra"]
-}
-
-module "pod_identity" {
-  source = "../_modules/pod_identity"
-
-  name                 = "${var.env}-eks-secrets-provider"
-  cluster_name         = module.eks.eks_cluster_name
-  namespace            = "kube-system"
-  service_account_name = "eks-secrets-provider"
-}
-
-
+### # external-secrets
 resource "aws_iam_policy" "eks-secrets-provider" {
   name = "EKSSecretsProviderIAMPolicy"
 
@@ -160,7 +149,19 @@ resource "aws_iam_policy" "eks-secrets-provider" {
   })
 }
 
+module "eks_secrets_provider_role" {
+  source = "../_modules/role_for_sa"
+
+  name                  = "${var.env}-eks-secrets-provider"
+  eks_oidc_provider_arn = module.eks.eks_oidc_provider_arn
+  namespace             = "kube-system"
+  service_account_name  = "eks-secrets-provider"
+}
+
+
+
+
 resource "aws_iam_role_policy_attachment" "eks-secrets-provider" {
-  role       = module.pod_identity.role_name
+  role       = module.eks_secrets_provider_role.role_name
   policy_arn = aws_iam_policy.eks-secrets-provider.arn
 }
