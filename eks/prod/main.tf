@@ -124,3 +124,43 @@ resource "aws_iam_role_policy_attachment" "this" {
   role       = module.role_for_sa.role_name
   policy_arn = aws_iam_policy.aws_lbc.arn
 }
+
+locals {
+  argocd_git_repo_creds = ["/argocd_git_repo_creds/common-infra"]
+}
+
+module "pod_identity" {
+  source = "../_modules/pod_identity"
+
+  name                 = "${var.env}-eks-secrets-provider"
+  cluster_name         = module.eks.eks_cluster_name
+  namespace            = "kube-system"
+  service_account_name = "eks-secrets-provider"
+}
+
+
+resource "aws_iam_policy" "eks-secrets-provider" {
+  name = "EKSSecretsProviderIAMPolicy"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "secretsmanager:GetResourcePolicy",
+          "secretsmanager:GetSecretValue",
+          "secretsmanager:DescribeSecret",
+          "secretsmanager:ListSecretVersionIds",
+          "ssm:GetParameter*"
+        ]
+        Resource = "*"
+      },
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "eks-secrets-provider" {
+  role       = module.pod_identity.role_name
+  policy_arn = aws_iam_policy.eks-secrets-provider.arn
+}
