@@ -8,14 +8,14 @@ locals {
       instance_types = ["t4g.small"]
       ami_type       = "AL2023_ARM_64_STANDARD"
     }
-    "monitoring" = { #max pods 관찰을 위한 임시 생성
-      ng_name        = "ng-monitoring"
-      min_size       = 1
-      max_size       = 1
-      desired_size   = 1
-      instance_types = ["t4g.medium"]
-      ami_type       = "AL2023_ARM_64_STANDARD"
-    }
+    # "monitoring" = {
+    #   ng_name        = "ng-monitoring"
+    #   min_size       = 1
+    #   max_size       = 1
+    #   desired_size   = 1
+    #   instance_types = ["t4g.medium"]
+    #   ami_type       = "AL2023_ARM_64_STANDARD"
+    # }
   }
 }
 
