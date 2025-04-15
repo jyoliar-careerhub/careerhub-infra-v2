@@ -62,6 +62,15 @@ resource "aws_eks_addon" "vpc-cni" {
   })
 }
 
+resource "aws_eks_addon" "pod-identity-agent" {
+  cluster_name  = aws_eks_cluster.this.name
+  addon_name    = "eks-pod-identity-agent"
+  addon_version = "v1.3.4-eksbuild.1"
+
+  resolve_conflicts_on_create = "OVERWRITE"
+  resolve_conflicts_on_update = "OVERWRITE"
+}
+
 resource "aws_eks_cluster" "this" {
   name = var.name
 
