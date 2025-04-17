@@ -127,24 +127,28 @@ resource "aws_iam_role_policy_attachment" "this" {
   policy_arn = aws_iam_policy.aws_lbc.arn
 }
 
-### # external-secrets
-resource "aws_iam_policy" "eks-secrets-provider" {
-  name = "EKSSecretsProviderIAMPolicy"
+#반복적인 인프라 생성/제거 과정에서 저장된 비밀키가 삭제되는 경우가 발생하여 외부 생성으로 변경
+data "aws_ssm_parameter" "argocd_private_key" {
+  name = "${var.env}-argocd-private-key"
+}
+
+resource "aws_iam_policy" "argocd_repo_reader" {
+  name = "${var.env}-argocd_repo_reader"
 
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
+        Sid    = "AllowSpecificSecret"
         Effect = "Allow"
         Action = [
-          "secretsmanager:GetResourcePolicy",
-          "secretsmanager:GetSecretValue",
-          "secretsmanager:DescribeSecret",
-          "secretsmanager:ListSecretVersionIds",
           "ssm:GetParameter*"
         ]
-        Resource = "*"
-      },
+
+        Resource = [
+          data.aws_ssm_parameter.argocd_private_key.arn
+        ]
+      }
     ]
   })
 }
@@ -152,16 +156,16 @@ resource "aws_iam_policy" "eks-secrets-provider" {
 module "eks_secrets_provider_role" {
   source = "../_modules/role_for_sa"
 
-  name                  = "${var.env}-eks-secrets-provider"
+  name                  = "${var.env}-argocd_repo_reader"
   eks_oidc_provider_arn = module.eks.eks_oidc_provider_arn
-  namespace             = "kube-system"
-  service_account_name  = "eks-secrets-provider"
+  namespace             = "argocd"
+  service_account_name  = "argocd_repo_reader"
 }
 
 
 
 
-resource "aws_iam_role_policy_attachment" "eks-secrets-provider" {
+resource "aws_iam_role_policy_attachment" "argocd_repo_reader" {
   role       = module.eks_secrets_provider_role.role_name
-  policy_arn = aws_iam_policy.eks-secrets-provider.arn
+  policy_arn = aws_iam_policy.argocd_repo_reader.arn
 }
