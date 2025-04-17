@@ -132,8 +132,8 @@ data "aws_ssm_parameter" "argocd_private_key" {
   name = "${var.env}-argocd-private-key"
 }
 
-resource "aws_iam_policy" "argocd_repo_reader" {
-  name = "${var.env}-argocd_repo_reader"
+resource "aws_iam_policy" "argocd-repo-reader" {
+  name = "${var.env}-argocd-repo-reader"
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -156,16 +156,16 @@ resource "aws_iam_policy" "argocd_repo_reader" {
 module "eks_secrets_provider_role" {
   source = "../_modules/role_for_sa"
 
-  name                  = "${var.env}-argocd_repo_reader"
+  name                  = "${var.env}-argocd-repo-reader"
   eks_oidc_provider_arn = module.eks.eks_oidc_provider_arn
   namespace             = "argocd"
-  service_account_name  = "argocd_repo_reader"
+  service_account_name  = "argocd-repo-reader"
 }
 
 
 
 
-resource "aws_iam_role_policy_attachment" "argocd_repo_reader" {
+resource "aws_iam_role_policy_attachment" "argocd-repo-reader" {
   role       = module.eks_secrets_provider_role.role_name
-  policy_arn = aws_iam_policy.argocd_repo_reader.arn
+  policy_arn = aws_iam_policy.argocd-repo-reader.arn
 }
